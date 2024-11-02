@@ -18,7 +18,6 @@ class SendMessageRequest extends FormRequest
             'message' => 'nullable|string',
             'media' => 'nullable|file',
             'media_type' => 'nullable|string|in:image,video,audio,pdf',
-            'type' => 'required|string|in:private,public',
         ];
     }
 }

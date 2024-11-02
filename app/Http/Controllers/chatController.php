@@ -61,7 +61,8 @@ public function deleteMessage(Request $request, int $messageId): JsonResponse
 {
     $conversations = $this->chatService->getUserConversations();
 
-    return response()->json($conversations, 200);
+    return response()->json([ 'message'=>'this is all conversation for you', 'data'=>$conversations]
+    , 200);
 }
 }
 

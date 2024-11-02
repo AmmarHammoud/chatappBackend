@@ -18,7 +18,6 @@ return new class extends Migration
             $table->text('message')->nullable();
             $table->string('media_path')->nullable();
             $table->string('media_type')->nullable();
-            $table->string('type')->default('private'); // خاص أو عام
             $table->enum('status', ['sent', 'delivered', 'seen'])->default('sent');
             $table->timestamps();
         });
