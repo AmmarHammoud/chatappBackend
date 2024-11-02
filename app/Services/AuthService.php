@@ -31,21 +31,29 @@ class AuthService
 
         return $user;
     }
-
     public function verifyCodeOnly(array $data)
     {
         $user = User::where('verification_code', $data['code'])->first();
 
         if (!$user) {
-            return false;
+            return false; // فشل التحقق إذا لم يتم العثور على المستخدم أو الكود خاطئ
         }
 
+        // تحديث حالة التحقق وتعيين الرمز إلى null بعد التحقق
         $user->email_verified_at = now();
         $user->verification_code = null;
         $user->save();
 
-        return $user->createToken('API Token')->plainTextToken;
+        // إنشاء التوكن وإرجاعه مع معلومات المستخدم
+        $token = $user->createToken('API Token')->plainTextToken;
+
+        return [
+            'token' => $token,
+            'user' => $user
+
+        ];
     }
+
 
     public function login(array $data)
     {
@@ -55,7 +63,7 @@ class AuthService
             return null;
         }
 
-        return $user->createToken('API Token')->accessToken;
+        return $user->createToken('API Token')->plainTextToken;
     }
 
     public function forgotPassword(array $data)
@@ -98,7 +106,7 @@ class AuthService
         return true;
     }
 
-    
+
 }
 
 

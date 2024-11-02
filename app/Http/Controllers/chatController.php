@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateConversationRequest;
+use App\Http\Requests\GetUserConversationsRequest;
 use App\Http\Requests\SendMessageRequest;
 use App\Http\Requests\UpdateMessageStatusRequest;
 use App\Services\ChatService;
@@ -56,8 +57,14 @@ public function deleteMessage(Request $request, int $messageId): JsonResponse
 
     return response()->json(['message' => 'Message deleted successfully'], 200);
 }
+   public function getUserConversations(GetUserConversationsRequest $request): JsonResponse
+{
+    $conversations = $this->chatService->getUserConversations();
 
-
+    return response()->json($conversations, 200);
 }
+}
+
+
 
 

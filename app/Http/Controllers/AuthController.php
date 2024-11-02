@@ -28,15 +28,19 @@ class AuthController extends Controller
     }
 
     public function verifyCodeOnly(VerifyCodeRequest $request): JsonResponse
-    {
-        $token = $this->authService->verifyCodeOnly($request->validated());
+{
+    $response = $this->authService->verifyCodeOnly($request->validated());
 
-        if (!$token) {
-            return response()->json(['message' => 'Invalid verification code.'], 400);
-        }
-
-        return response()->json(['message' => 'Email verified successfully.', 'token' => $token], 200);
+    if (!$response) {
+        return response()->json(['message' => 'Invalid verification code.'], 400);
     }
+
+    return response()->json([
+        'message' => 'Email verified successfully.',
+        'user' => $response['user'],
+        'token' => $response['token']
+    ], 200);
+}
 
     public function login(LoginRequest $request): JsonResponse
     {
@@ -46,7 +50,8 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials or email not verified.'], 401);
         }
 
-        return response()->json(['token' => $token], 200);
+        return response()->json([ 'message'=>' login succesfully','token'=> $token],
+        200);
     }
 
     public function userForgetPassword(ForgotPasswordRequest $request): JsonResponse
@@ -72,6 +77,6 @@ class AuthController extends Controller
             ? response()->json(['message' => 'Password reset successfully.'], 200)
             : response()->json(['message' => 'Invalid or expired code.'], 400);
     }
- 
+
 
 }

@@ -24,6 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('message', [chatController::class, 'sendMessageWithMedia']);
     Route::post('messages/update-status', [chatController::class, 'updateMessageStatus']);
     Route::post('deletemessage/{messageId}', [ChatController::class, 'deleteMessage']);
+    Route::get('user/conversations', [ChatController::class, 'getUserConversations']);
 
     //for story
     Route::post('addstory', [StoryController::class, 'create']);
