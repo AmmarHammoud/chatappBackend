@@ -63,8 +63,15 @@ class AuthService
             return null;
         }
 
-        return $user->createToken('API Token')->plainTextToken;
+
+        $token = $user->createToken('API Token')->plainTextToken;
+
+        return [
+            'user' => $user,
+            'token' => $token,
+        ];
     }
+
 
     public function forgotPassword(array $data)
     {

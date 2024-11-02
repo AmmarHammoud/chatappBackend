@@ -44,13 +44,15 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request): JsonResponse
     {
-        $token = $this->authService->login($request->validated());
 
-        if (!$token) {
+
+            $loginData = $this->authService->login($request->validated());
+
+        if (!$loginData) {
             return response()->json(['message' => 'Invalid credentials or email not verified.'], 401);
         }
 
-        return response()->json([ 'message'=>' login succesfully','token'=> $token],
+        return response()->json([ 'message'=>' login succesfully','data'=> $loginData],
         200);
     }
 

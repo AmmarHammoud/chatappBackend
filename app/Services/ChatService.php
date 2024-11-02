@@ -110,7 +110,6 @@ public function getUserConversations()
     {
         $userId = Auth::id();
 
-        // جلب المحادثات التي يكون المستخدم الحالي طرفًا فيها
         return Conversation::where('user1_id', $userId)
             ->orWhere('user2_id', $userId)
             ->get();
