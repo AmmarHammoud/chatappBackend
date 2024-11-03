@@ -9,7 +9,7 @@ class message extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['conversation_id', 'status','user_id', 'message', 'media_path', 'media_type', ];
+    protected $fillable = ['conversation_id', 'status','user_id', 'message', 'media_path', 'media_type',];
 
     public function conversation()
     {
@@ -20,4 +20,12 @@ class message extends Model
     {
         return $this->belongsTo(User::class);
     }
-}
+
+
+        public function reactions()
+        {
+            return $this->hasMany(Reaction::class );
+        }
+
+    }
+

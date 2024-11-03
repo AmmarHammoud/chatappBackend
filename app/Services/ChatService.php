@@ -5,25 +5,29 @@ namespace App\Services;
 use App\Events\PrivateMessage;
 use App\Events\PublicMessage;
 use App\Models\Conversation;
+use App\Models\Group;
 use App\Models\Message;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Http\UploadedFile;
 class ChatService
 {
-    public function sendMessage($validatedData)
+    public function sendMessageWithMedia(array $data)
     {
         $message = new Message();
-        $message->conversation_id = $validatedData['conversation_id'];
-        $message->user_id = Auth::id();
-        $message->message = $validatedData['message'] ?? null;
-       // $message->type = $validatedData['type'];
+        $message->conversation_id = $data['conversation_id'];
+        $message->user_id = auth()->id();
+        $message->message = $data['message'] ?? null;
+        $message->status = 'sent';
 
-        if (isset($validatedData['media'])) {
-            $destinationPath = 'chat/media/';
-            $media = $validatedData['media'];
+        // التحقق من نوع الوسائط وتخزينها إذا وجدت
+        if (isset($data['media'])) {
+            $destinationPath = 'uploads/media/';
+            $media = $data['media'];
             $fileName = time() . '_' . $media->getClientOriginalName();
 
-            switch ($validatedData['media_type']) {
+            // تحديد المسار بناءً على نوع الوسائط
+            switch ($data['media_type']) {
                 case 'image':
                     $destinationPath .= 'images';
                     break;
@@ -33,16 +37,14 @@ class ChatService
                 case 'audio':
                     $destinationPath .= 'audio';
                     break;
-                case 'pdf':
-                    $destinationPath .= 'pdfs';
-                    break;
                 default:
-                    $destinationPath .= 'others';
+                    throw new \Exception('Invalid media type.');
             }
 
+            // رفع الملف وتحديث مسار الوسائط والنوع
             $media->move(public_path($destinationPath), $fileName);
             $message->media_path = $destinationPath . '/' . $fileName;
-            $message->media_type = $validatedData['media_type'];
+            $message->media_type = $data['media_type'];
         }
 
         $message->save();
@@ -53,9 +55,9 @@ class ChatService
         return $message;
     }
 
-
-    public function createConversation($validatedData)
+    public function createConversation(array $validatedData)
     {
+        // التحقق من وجود محادثة سابقة بين المستخدمين
         $existingConversation = Conversation::where(function ($query) use ($validatedData) {
             $query->where('user1_id', Auth::id())
                   ->where('user2_id', $validatedData['user_id']);
@@ -64,17 +66,21 @@ class ChatService
                   ->where('user2_id', Auth::id());
         })->first();
 
+        // إذا كانت المحادثة موجودة بالفعل، إرجاع null
         if ($existingConversation) {
-            return $existingConversation->id;
+            return null;
         }
 
+        // إنشاء المحادثة الجديدة
         $conversation = Conversation::create([
             'user1_id' => Auth::id(),
             'user2_id' => $validatedData['user_id'],
         ]);
 
-        return $conversation->id;
+        return $conversation;
     }
+
+
     public function updateMessageStatus(int $messageId, string $status): bool
     {
         $validStatuses = ['sent', 'delivered', 'seen'];
@@ -107,13 +113,17 @@ class ChatService
     return $message->delete();
 }
 public function getUserConversations()
-    {
-        $userId = Auth::id();
+{
+    $userId = Auth::id();
 
-        return Conversation::where('user1_id', $userId)
-            ->orWhere('user2_id', $userId)
-            ->get();
-    }
+    // جلب كافة المحادثات الخاصة بالمستخدم الحالي مع معلومات المستخدمين الآخرين في كل محادثة
+    $conversations = Conversation::where('user1_id', $userId)
+        ->orWhere('user2_id', $userId)
+        ->with(['user1', 'user2','lastMessage']) // إضافة معلومات المستخدمين المشاركين في المحادثة
+        ->get();
+
+    return $conversations;
+}
     public function getMessagesByConversationId(int $conversationId, int $offset = 0, int $limit = 30)
     {
         $userId = Auth::id();
@@ -129,11 +139,4 @@ public function getUserConversations()
             ->limit($limit)
             ->get();
     }
-
-    }
-
-
-
-
-
-
+}

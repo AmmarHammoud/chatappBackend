@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\chatController;
+use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\StoryController;
 
 /*
@@ -21,11 +22,17 @@ use App\Http\Controllers\StoryController;
 Route::middleware('auth:sanctum')->group(function () {
     //for chat
     Route::post('conversation', [ChatController::class, 'createConversation']);
-    Route::post('message', [chatController::class, 'sendMessageWithMedia']);
+    Route::post('message', [chatController::class, 'sendMessage']);
     Route::post('messages/update-status', [chatController::class, 'updateMessageStatus']);
     Route::post('deletemessage/{messageId}', [ChatController::class, 'deleteMessage']);
     Route::get('user/conversations', [ChatController::class, 'getUserConversations']);
     Route::get('conversations/{conversationId}', [ChatController::class, 'getMessages']);
+
+    //for reaction
+    Route::post('reaction', [ReactionController::class, 'addReaction']);
+    Route::post('deletereaction', [ReactionController::class, 'removeReaction']);
+    Route::get('reactions', [ReactionController::class, 'getReactions']);
+    //for group
 
     //for story
     Route::post('addstory', [StoryController::class, 'create']);
