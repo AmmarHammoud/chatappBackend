@@ -16,7 +16,7 @@ class ChatService
         $message->conversation_id = $validatedData['conversation_id'];
         $message->user_id = Auth::id();
         $message->message = $validatedData['message'] ?? null;
-        $message->type = $validatedData['type'];
+        // $message->type = $validatedData['type'];
 
         if (isset($validatedData['media'])) {
             $destinationPath = 'chat/media/';
