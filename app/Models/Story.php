@@ -29,4 +29,8 @@ class Story extends Model
     {
         return $this->expires_at < carbon::now();
     }
+    public function reactions()
+    {
+        return $this->morphMany(Reaction::class, 'reactable');
+    }
 }

@@ -20,4 +20,19 @@ class conversation extends Model
     {
         return $this->belongsToMany(User::class, 'conversation_user');
     }
+    public function user1()
+{
+    return $this->belongsTo(User::class, 'user1_id');
+}
+
+public function user2()
+{
+    return $this->belongsTo(User::class, 'user2_id');
+}
+// في موديل Conversation
+public function lastMessage()
+{
+    return $this->hasOne(Message::class, 'conversation_id')->latestOfMany();
+}
+
 }
