@@ -16,7 +16,7 @@ class ChatService
         $message->conversation_id = $validatedData['conversation_id'];
         $message->user_id = Auth::id();
         $message->message = $validatedData['message'] ?? null;
-        // $message->type = $validatedData['type'];
+       // $message->type = $validatedData['type'];
 
         if (isset($validatedData['media'])) {
             $destinationPath = 'chat/media/';
@@ -114,6 +114,22 @@ public function getUserConversations()
             ->orWhere('user2_id', $userId)
             ->get();
     }
+    public function getMessagesByConversationId(int $conversationId, int $offset = 0, int $limit = 30)
+    {
+        $userId = Auth::id();
+        $conversation = Conversation::find($conversationId);
+
+        if (!$conversation || (!$conversation->user1_id === $userId && !$conversation->user2_id === $userId)) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        return Message::where('conversation_id', $conversationId)
+            ->orderBy('created_at', 'desc') // ترتيب الرسائل من الأحدث إلى الأقدم
+            ->offset($offset)
+            ->limit($limit)
+            ->get();
+    }
+
     }
 
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateConversationRequest;
+use App\Http\Requests\GetMessagesRequest;
 use App\Http\Requests\GetUserConversationsRequest;
 use App\Http\Requests\SendMessageRequest;
 use App\Http\Requests\UpdateMessageStatusRequest;
@@ -63,6 +64,18 @@ public function deleteMessage(Request $request, int $messageId): JsonResponse
 
     return response()->json([ 'message'=>'this is all conversation for you', 'data'=>$conversations]
     , 200);
+}
+
+public function getMessages(Request $request, int $conversationId): JsonResponse
+{
+    $offset = $request->get('offset', 0); // استرجاع قيمة offset من الطلب
+    $messages = $this->chatService->getMessagesByConversationId($conversationId, $offset);
+
+    if ($messages instanceof JsonResponse) {
+        return $messages; 
+    }
+
+    return response()->json($messages, 200);
 }
 }
 
