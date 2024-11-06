@@ -113,6 +113,7 @@ public function getUserConversations(): JsonResponse
                     'media_path' => $conversation->lastMessage->media_path,
                     'media_type' => $conversation->lastMessage->media_type,
                     'created_at' => $conversation->lastMessage->created_at,
+                    'status'=>$conversation->lastMessage->status
                 ] : null
             ];
         })
