@@ -20,6 +20,8 @@ use App\Http\Controllers\StoryController;
 
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('pusher_auth', [AuthController::class, 'pusherAuth']);
+
     //for chat
     Route::post('conversation', [ChatController::class, 'createConversation']);
     Route::post('message', [chatController::class, 'sendMessage']);

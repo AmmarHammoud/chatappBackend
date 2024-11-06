@@ -33,6 +33,8 @@ class PrivateMessage implements ShouldBroadcast
             'message' => $this->message->message,
             'status' => $this->message->status,
             'updated_at' => $this->message->updated_at,
+            'created_at' => $this->message->created_at,
+            'user_id' => $this->message->user_id,
         ];
     }
 }

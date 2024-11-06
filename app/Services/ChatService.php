@@ -50,7 +50,7 @@ class ChatService
         $message->save();
 
         broadcast(new PrivateMessage($message))->toOthers();
-
+        // broadcast(new PublicMessage($message))->toOthers();
 
         return $message;
     }

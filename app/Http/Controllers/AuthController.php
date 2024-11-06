@@ -9,8 +9,10 @@ use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\CheckResetPasswordCodeRequest;
 use App\Http\Requests\ProfileImageRequest;
 use App\Http\Requests\ResetPasswordRequest;
+use Illuminate\Http\Request;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
+use Pusher\Pusher;
 
 class AuthController extends Controller
 {
@@ -80,5 +82,18 @@ class AuthController extends Controller
             : response()->json(['message' => 'Invalid or expired code.'], 400);
     }
 
-
+    public function pusherAuth(Request $request): JsonResponse{
+        $request->validate(['channel_name' => 'required|string', 'socket_id' => 'required']);
+        $pusher = new Pusher(
+            env('PUSHER_APP_KEY'),
+            env('PUSHER_APP_SECRET'),
+            env('PUSHER_APP_ID'),
+            [
+                'cluster' => 'eu',
+                'useTLS'  => true,
+            ]
+        );
+        $auth = $pusher->socket_auth($request->channel_name, $request->socket_id);
+        return response()->json(['message' => 'authorized succsessfully', 'auth' => $auth]);
+    }
 }
