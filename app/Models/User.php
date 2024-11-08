@@ -22,7 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'profile_image'
+        'profile_image',
+        'is_online', 'last_seen_at'
     ];
 
     /**
@@ -56,7 +57,7 @@ class User extends Authenticatable
     public function story(){
         return $this->hasMany(story::class);
     }
-   
+
 
     public function reactions()
     {

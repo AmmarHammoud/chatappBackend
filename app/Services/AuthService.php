@@ -112,6 +112,36 @@ class AuthService
 
         return true;
     }
+    public function updateUserMedia(User $user,  $media, $type = 'image')
+    {
+        $destinationPath = 'story/media/';
+
+        // تحديد المسار بناءً على نوع الوسائط
+        switch ($type) {
+            case 'image':
+                $destinationPath .= 'images';
+                break;
+            case 'video':
+                $destinationPath .= 'videos';
+                break;
+            default:
+                $destinationPath .= 'others';
+        }
+
+        // إنشاء اسم الملف مع timestamp لمنع التكرار
+        $fileName = time() . '_' . $media->getClientOriginalName();
+
+        // نقل الملف إلى المسار المحدد داخل مجلد public
+        $media->move(public_path($destinationPath), $fileName);
+
+        // تحديث مسار الوسائط في نموذج المستخدم (أو أي نموذج آخر)
+        $user->update([
+            'media_path' => $destinationPath . '/' . $fileName,
+        ]);
+
+        return $destinationPath . '/' . $fileName;
+    }
+
 
 
 }

@@ -4,10 +4,12 @@ namespace App\Services;
 
 use App\Events\PrivateMessage;
 use App\Events\PublicMessage;
+use App\Events\UserStatusUpdated;
 use App\Models\Conversation;
 use App\Models\Group;
 use App\Models\Message;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\UploadedFile;
 class ChatService
@@ -139,4 +141,18 @@ public function getUserConversations()
             ->limit($limit)
             ->get();
     }
+    public function updateUserStatus(bool $isOnline): void
+{
+    $userId = Auth::id();
+
+    if ($userId) {
+        $user = User::find($userId);
+
+        $user->update([
+            'is_online' => $isOnline,
+            'last_seen_at' => $isOnline ? null : Carbon::now(),
+        ]);
+
+        broadcast(new UserStatusUpdated($user));
+    }}
 }
