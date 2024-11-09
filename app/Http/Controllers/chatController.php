@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserStatusUpdated;
 use App\Http\Requests\AddMemberRequest;
 use App\Http\Requests\CreateConversationRequest;
 use App\Http\Requests\CreateGroupRequest;
@@ -12,8 +13,10 @@ use App\Http\Requests\UpdateMessageStatusRequest;
 use App\Models\Group;
 use App\Models\User;
 use App\Services\ChatService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class chatController extends Controller
 {
@@ -99,12 +102,15 @@ public function getUserConversations(): JsonResponse
                         'name' => $conversation->user1->name,
                         'email' => $conversation->user1->email,
                         'profile_image' => $conversation->user1->profile_image,
+                        'status' => $this->getUserStatus($conversation->user1),
                     ],
                     [
                         'id' => $conversation->user2->id,
                         'name' => $conversation->user2->name,
                         'email' => $conversation->user2->email,
                         'profile_image' => $conversation->user2->profile_image,
+                        'status' => $this->getUserStatus($conversation->user2),
+
                     ]
                 ],
                 'last_message' => $conversation->lastMessage ? [
@@ -133,7 +139,27 @@ public function getMessages(Request $request, int $conversationId): JsonResponse
     return response()->json($messages, 200);
 }
 
+public function checkAndUpdateStatus(): JsonResponse
+{
+    try {
 
+        $this->chatService->updateUserStatus(true); 
+
+        return response()->json(['message' => 'User status updated successfully.']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 400);
+    }}
+
+
+    private function getUserStatus($user): string
+{
+    if ($user->is_online) {
+        return 'Online';
+    }
+
+    return $user->last_seen_at ? $user->last_seen_at->toDateTimeString() : 'Offline';
 
 
 }
+}
+

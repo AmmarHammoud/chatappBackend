@@ -9,9 +9,11 @@ use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\CheckResetPasswordCodeRequest;
 use App\Http\Requests\ProfileImageRequest;
 use App\Http\Requests\ResetPasswordRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Pusher\Pusher;
 
 class AuthController extends Controller
@@ -57,6 +59,29 @@ class AuthController extends Controller
         return response()->json([ 'message'=>' login succesfully','data'=> $loginData],
         200);
     }
+
+
+
+    public function logout()
+    {
+
+        $userId = Auth::id();
+
+        if ($userId) {
+            $user = User::find($userId);
+        if ($user) {
+            $user->update([
+                'is_online' => false,
+                'last_seen_at' => now(),  // يتم تحديد وقت آخر ظهور
+            ]);
+        }
+
+        // قم بتدمير التوكن أو الجلسة هنا
+        Auth::logout();
+
+        return response()->json(['message' => 'Successfully logged out.']);
+    }}
+
 
     public function userForgetPassword(ForgotPasswordRequest $request): JsonResponse
     {
