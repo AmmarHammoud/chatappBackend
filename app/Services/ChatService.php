@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Events\PrivateMessage;
 use App\Events\PublicMessage;
 use App\Events\UserStatusUpdated;
-use App\Models\Conversation;
+use App\Models\conversation;
 use App\Models\Group;
 use App\Models\Message;
 use App\Models\User;
