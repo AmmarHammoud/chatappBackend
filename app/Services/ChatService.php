@@ -7,7 +7,7 @@ use App\Events\PublicMessage;
 use App\Events\UserStatusUpdated;
 use App\Models\conversation;
 use App\Models\Group;
-use App\Models\Message;
+use App\Models\message;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
