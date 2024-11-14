@@ -21,6 +21,7 @@ class User extends Authenticatable
         'verification_code',
         'name',
         'email',
+        'user_name',
         'password',
         'profile_image',
         'is_online', 'last_seen_at'
@@ -54,9 +55,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(conversation::class);
     }
-    public function story(){
-        return $this->hasMany(story::class);
+    public function stories()
+    {
+        return $this->hasMany(Story::class);
     }
+
 
 
     public function reactions()
