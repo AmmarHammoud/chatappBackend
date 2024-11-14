@@ -85,10 +85,8 @@ public function deleteMessage(Request $request, int $messageId): JsonResponse
 }
 public function getUserConversations(): JsonResponse
 {
-    // جلب المحادثات من الخدمة
     $conversations = $this->chatService->getUserConversations();
 
-    // تهيئة الاستجابة مع تفاصيل المحادثات وآخر رسالة
     return response()->json([
         'message' => 'Conversations retrieved successfully.',
         'conversations' => $conversations->map(function ($conversation) {
@@ -103,14 +101,34 @@ public function getUserConversations(): JsonResponse
                         'email' => $conversation->user1->email,
                         'profile_image' => $conversation->user1->profile_image,
                         'status' => $this->getUserStatus($conversation->user1),
+                        'stories' => $conversation->user1->stories->map(function ($story) {
+                            return [
+                                'id' => $story->id,
+                                'type'=>$story->type,
+                                'content' => $story->content,
+                                'media_path' => $story->media_path,
+                                'created_at' => $story->created_at,
+
+                            ];
+                        })
                     ],
+
                     [
                         'id' => $conversation->user2->id,
                         'name' => $conversation->user2->name,
                         'email' => $conversation->user2->email,
                         'profile_image' => $conversation->user2->profile_image,
                         'status' => $this->getUserStatus($conversation->user2),
+                        'stories' => $conversation->user1->stories->map(function ($story) {
+                            return [
+                                'id' => $story->id,
+                                'type'=>$story->type,
+                                'content' => $story->content,
+                                'media_path' => $story->media_path,
+                                'created_at' => $story->created_at,
 
+                            ];
+                        })
                     ]
                 ],
                 'last_message' => $conversation->lastMessage ? [
@@ -119,7 +137,7 @@ public function getUserConversations(): JsonResponse
                     'media_path' => $conversation->lastMessage->media_path,
                     'media_type' => $conversation->lastMessage->media_type,
                     'created_at' => $conversation->lastMessage->created_at,
-                    'status'=>$conversation->lastMessage->status
+                    'status' => $conversation->lastMessage->status
                 ] : null
             ];
         })
@@ -143,7 +161,7 @@ public function checkAndUpdateStatus(): JsonResponse
 {
     try {
 
-        $this->chatService->updateUserStatus(true); 
+        $this->chatService->updateUserStatus(true);
 
         return response()->json(['message' => 'User status updated successfully.']);
     } catch (\Exception $e) {
@@ -160,6 +178,16 @@ public function checkAndUpdateStatus(): JsonResponse
     return $user->last_seen_at ? $user->last_seen_at->toDateTimeString() : 'Offline';
 
 
+}
+public function searchUsers(Request $request): JsonResponse
+{
+    $query = $request->input('user_name');
+    $users = $this->chatService->searchUser($query);
+
+    return response()->json([
+        'message' => 'Users retrieved successfully.',
+        'users' => $users
+    ], 200);
 }
 }
 

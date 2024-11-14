@@ -47,11 +47,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware(['auth:sanctum', UpdateUserOnlineStatus::class])->group(function () {
         Route::get('user/status', [chatController::class, 'checkAndUpdateStatus']);
 
-     
-    });
-//2|qhejh3roeLaJEF8RVl6TNgpuPXOWAfOrQEhEhpJo56de2233
 
-//1|7tkdaYuawEqY2KH5VTchKmnPBZiU4YSBXMNbnGni1f0c174d
+        //for search
+        Route::get('search', [chatController::class, 'searchUsers']);
+    });
+
 });
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);

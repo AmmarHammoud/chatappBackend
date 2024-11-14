@@ -18,6 +18,8 @@ class AuthService
 {
     public function register(array $data)
     {
+        $userName = $data['user_name'] ?? $this->generateRandomUsername($data['name']);
+
         $verificationCode = random_int(100000, 999999);
 
         $user = User::create([
@@ -25,12 +27,28 @@ class AuthService
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
             'verification_code' => $verificationCode,
+            'user_name' => $userName,
         ]);
 
         Mail::to($user->email)->send(new SendVerificationCode($user, $verificationCode));
 
         return $user;
     }
+
+    protected function generateRandomUsername($name)
+    {
+        $baseName = preg_replace('/\s+/', '', $name);
+        $randomNumber = rand(100, 999);
+        $username = strtolower($baseName) . $randomNumber;
+
+        while (User::where('user_name', $username)->exists()) {
+            $randomNumber = rand(100, 999);
+            $username = strtolower($baseName) . $randomNumber;
+        }
+
+        return $username;
+    }
+
     public function verifyCodeOnly(array $data)
     {
         $user = User::where('verification_code', $data['code'])->first();

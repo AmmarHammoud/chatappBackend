@@ -121,7 +121,7 @@ public function getUserConversations()
     // جلب كافة المحادثات الخاصة بالمستخدم الحالي مع معلومات المستخدمين الآخرين في كل محادثة
     $conversations = Conversation::where('user1_id', $userId)
         ->orWhere('user2_id', $userId)
-        ->with(['user1', 'user2','lastMessage']) // إضافة معلومات المستخدمين المشاركين في المحادثة
+        ->with(['user1.stories', 'user2.stories','lastMessage']) // إضافة معلومات المستخدمين المشاركين في المحادثة
         ->get();
 
     return $conversations;
@@ -138,7 +138,7 @@ public function getUserConversations()
         return Message::where('conversation_id', $conversationId)
             ->orderBy('created_at', 'desc') // ترتيب الرسائل من الأحدث إلى الأقدم
             ->offset($offset)
-            ->limit($limit)
+            ->limit($limit)->with('reactions')
             ->get();
     }
     public function updateUserStatus(bool $isOnline): void
@@ -155,4 +155,12 @@ public function getUserConversations()
 
         broadcast(new UserStatusUpdated($user));
     }}
+
+    public function searchUser(string $query)
+    {
+        
+        return User::where('user_name', 'LIKE', "%{$query}%")
+
+                    ->get();
+    }
 }
